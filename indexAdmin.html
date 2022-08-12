@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <base href="/">
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SOC | Live Score System</title>
+    <meta name="description"
+        content="Giải Đấu được mở rộng đến tất cả các người chơi Nam là người Việt Nam hay người nước ngoài đang sinh sống và làm việc tại TP. HCM và các tỉnh thành tính từ Đà Nẵng trở vào. Người chơi tham gia phải là người chơi Nghiệp dư theo Luật về Tư Cách Nghiệp Dư 2022 được quy định bởi R&A Rules Limited và Hiệp hội Gôn Hoa Kỳ USGA. Người chơi phải có mã Vhandicap và điểm chấp index (handicap index) hợp lệ, điểm chấp index giới hạn là 9.0.">
+    <meta name="keywords" content="Golf, single, Vietnam">
+    <meta name="author" content="Hieu Nguyen">
+    <meta name="MobileOptimized" content="320">
+
+    <!-- favicon links-->
+    <link rel="icon" type="image/icon" href="favicon.png">
+    <!-- main css -->
+    <link rel="stylesheet" href="css/bootstrap.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-0evHe/X+R7YkIZDRvuzKMRqM+OrBnVFBL6DOitfPri4tjfHxaWutUpFmBp4vmVor" crossorigin="anonymous">
+    <link rel="stylesheet" href="css/fonts.css">
+    <link rel="stylesheet" href="css/font-awesome.css">
+    <link rel="stylesheet" href="css/custom-animation.css">
+    <link rel="stylesheet" href="js/plugin/owl/owl.carousel.min.css">
+    <link rel="stylesheet" href="js/plugin/owl/owl.theme.css">
+    <link rel="stylesheet" href="js/plugin/magnific/magnific-popup.css">
+    <link rel="stylesheet" href="css/admin-css.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css"
+        integrity="sha512-KfkfwYDsLkIlwQp6LFnl8zNdLGxu9YAA1QvwINks4PhcElQSvqcyVLLD9aMhXd13uQjoXtEKNosOWaZqXgel0g=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <!-- Library Imports -->
+    <script src="modules/angular/angular.min.js"></script>
+    <script src="modules/angular-route/angular-route.js"></script>
+    <script src="modules/angular-animate/angular-animate.min.js"></script>
+    <script src="modules/angular-aria/angular-aria.min.js"></script>
+    <script src="modules/angular-material/angular-material.js"></script>
+    <script src="modules/angular-messages/angular-messages.min.js"></script>
+    <script src="modules/angular-socket-io/socket.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.4/socket.io.js"></script>
+
+    <!-- Import Angular Modules -->
+    <script src="AngularModules/app.mainModule.js"></script>
+
+    <!-- Import Angular Controller -->
+    <script src="AngularControllers/score.controller.js"></script>
+
+    <!-- Import Angular Services -->
+    <script src="AngularServices/socketService.js"></script>
+
+    <!-- Import ngRoute -->
+    <script src="page.loader.js"></script>
+</head>
+
+<body ng-app="mainModule">
+    <section class="mobile-header py-1">
+        <div class="container">
+            <div class="row mt-4 mb-4">
+                <div class="col-12 d-flex justify-content-between">
+                    <img style="width: 175px;" src="images/official-logo.png" alt="logo SOC">
+                    <a href="/#livescore" target="_blank" class="btn btn-success px-5" style="height: fit-content"> 🏠</a>
+                    <button ng-click="logout()" class="btn btn-warning" style="height: fit-content"><img
+                            style="width:14px" src="images/svg/logout.svg"></button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section>
+        <div class="container">
+            <div class="row">
+                <div class="sign-in-tile mt-4 mb-2 col-12">
+                    <h1>Hệ thống LIVE SCORE <br>Giải golf</h1>
+                    <p class="text-guide mt-4">Vui lòng nhâp tài khoản mà quản trị viên đã cung cấp</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section ng-controller="scoreController">
+        <div class="container pb-5" ng-show="!username">
+            <div class="row mt-2">
+                <div class="col-12">
+                    <p style="font-weight: bold; color: #28256B;" class="col-12 mt-3 mb-1">Tài khoản</p>
+                    <input style="border: none; border-radius: 9px; background-color: whitesmoke; padding: 10px 20px;" class="col-12 mb-3" type="text" ng-model="usernameText">
+                </div>
+                <div class="col-12 mt-1">
+                    <p style="font-weight: bold; color: #28256B;" class="col-12 mt-1 mb-1">Mật khẩu</p>
+                    <input style="border: none; border-radius: 9px; background-color: whitesmoke; padding: 10px 20px;" class="col-12 mb-3" type="password" ng-model="passwordText">
+                </div>
+                <div class="col-12 mt-1">
+                    <button style="color: white; background-color: #28256B; font-size: 12px;" ng-click="login()" class="btn btn-block btn-primary py-3">Đăng nhập</button>
+                </div>
+                <div class="col-12">
+                    <p class="text-guide mt-5 mb-2">Nếu có sự cố kỹ thuật vui lòng liên hệ: <a href="tel:0982348515">098 234 85 15</a></p>
+                </div>
+            </div>
+        </div>
+        <div class="container" ng-show="!!username && !editingId">
+            <div class="row mx-1">
+                <div class="col-10">
+                    <p style="font-weight: bold; color: #28256B;" class="col-12 mt-3 mb-1">Tìm kiếm Golfer</p>
+                    <input class="col-12 mb-3 search-golfer" type="text" ng-model="nameSearchingText"
+                        ng-keyup="search(this.value)" placeholder="Nhập tên Golfer cần tìm..">
+                </div>
+                <div class="col-2 mt-4">
+                    <button ng-click="refreshGolfers()" class="btn btn-danger px-2 my-3">⟳</button>
+                </div>
+            </div>
+            <table id="leaderboard" class="table" cellspacing="0" width="100%">
+                <thead>
+                    <tr class="bg-dark">
+                        <th style="width:15%;" class="th-sm">Group</th>
+                        <th style="width:45%;" class="th-sm">Golfer Name</th>
+                        <th style="width:10%;" class="th-sm">Thru</th>
+                        <th style="width:10%;" class="th-sm">Score</th>
+                        <th style="width:10%;" class="th-sm">Total</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr ng-repeat="golfer in golfers" ng-show="matchSearching(golfer.playerName)">
+                        <td>--</td>
+                        <td ng-click="edit(golfer.id)">{{ golfer.playerName }}</td>
+                        <td>{{ golfer.thru }}</td>
+                        <td>{{ golfer.totalScore }}</td>
+                        <td>--</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="container" ng-show="!!username && !!editingId">
+            <div class="row border">
+                <div class="col-12 bg-dark mb-2 text-light text-center"
+                    style="display:flex;justify-content: space-between">
+                    <button ng-click="doneEdit()" class="btn btn-warning p-1 my-3 border-0">←</button>
+                    <h3 class="my-3 d-inline-block">{{golfer.playerName}}</h3>
+                    <button ng-click="refreshGolfer()" class="btn btn-danger px-1 my-3 border-0">⟳</button>
+                </div>
+
+                <div class="col-6 h6 pt-2">
+                    Group
+                </div>
+                <div class="col-6">
+                    <select class="form-select" ng-model="group" ng-options="x for x in groupOptions"
+                        ng-change="updateGolferGroup()">
+                    </select>
+                </div>
+                <div class="col-12 mt-3">
+                    <table class="table table-striped w-100">
+                        <tbody>
+                            <tr>
+                                <th>Hole</th>
+                                <th>Par</th>
+                                <th>Score</th>
+                            </tr>
+                            <tr ng-repeat="holeId in holeIds">
+                                <td class="w-25 h4 align-middle text-center">{{holeNames[$index]}}</td>
+                                <td class="w-25 h4 align-middle text-center">{{holePars[$index]}}</td>
+                                <td class="w-75">
+                                    <select class="form-select" ng-model="scores[$index]" ng-change="updateHole($index)"
+                                        ng-options="x for x in scoreOptions">
+                                    </select>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div class="container" ng-hide="!error">
+            <div class="alert alert-danger" role="alert">
+                Lỗi: {{error}}
+            </div>
+        </div>
+
+    </section>
+
+    <script src="modules/material-design-lite/material.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-pprn3073KE6tl6bjs2QrFaJGz5/SUsLqktiwsUTF55Jfv3qYSDhgCecCxMW52nD2"
+        crossorigin="anonymous"></script>
+</body>
+
+<footer>
+    <div class="copyright-part">
+        <div class="container">
+            <div class="row pt-2 mt-1">
+                <div class="col-12">
+                    <p class="text-center">Copyright &copy; 2022, <a href="https://livechannel.vn/"
+                            target="_blank">LiveChannel</a>. All Rights Reserved.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</footer>
+
+</html>
